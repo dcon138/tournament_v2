@@ -8,14 +8,16 @@ This application will serve as the companion app to another project called vue-s
 
 ### Step 1: Clone the repo
 ```
-git clone https://github.com/layer7be/vue-starter-laravel-api
+git clone https://github.com/dcon138/laravel5-boilerplate
 ```
 
 ### Step 2: Prerequisites
 ```
 cp .env.example .env
+update .env with DB details
+remove the pre-update-cmd from composer.json
 composer install
-touch database/database.sqlite
+re-add the pre-update-cmd to composer.json
 php artisan migrate
 php artisan db:seed
 php artisan key:generate
@@ -23,13 +25,15 @@ php artisan vendor:publish --provider="Tymon\JWTAuth\Providers\JWTAuthServicePro
 php artisan jwt:generate
 ```
 
-### Step 3: Serve
+### Step 3: Serve (with Apache)
 ```
-php artisan serve
+Set up a Virtual Host
+Set up an entry in hosts file
+Start Apache
 ```
 
-### Note about Apache
-If you use Apache to serve this, you will need to add the following 2 lines to your .htaccess (or your virtualhost configuration):
+### Note: If NOT Using Apache
+If you don't use Apache to serve this, you will need to remove the following 2 lines from your .htaccess:
 ```
 RewriteCond %{HTTP:Authorization} ^(.*)
 RewriteRule .* - [e=HTTP_AUTHORIZATION:%1]
