@@ -1,8 +1,8 @@
-## vue-starter Backend API (Laravel-based)
+## Laravel 5 API (based off vue-starter Backend API)
 
-This application will serve as the companion app to another project called vue-starter. It is meant to be a small demo of a Laravel API, using Dingo and JWT for authentication.
+This application serves as a boilerplate for a laravel 5 API project. It is a Laravel 5 API, using Dingo and JWT for authentication.
 
-[vue-starter Frontend App](https://github.com/layer7be/vue-starter)
+The boilerplate was largely adopted from [vue-starter Backend API](https://github.com/layer7be/vue-starter-laravel-api)
 
 ## Installation
 
