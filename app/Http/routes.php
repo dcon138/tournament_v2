@@ -8,8 +8,8 @@ $api->version('v1', function ($api) {
 	$api->group(['namespace' => 'Api\Controllers', 'middleware' => '\Barryvdh\Cors\HandleCors::class'], function ($api) {
 
 		// Login route
-		$api->post('jwt/login', 'AuthController@authenticate');
-		$api->post('register', 'AuthController@register'); //TODO this is boilerpate, update it as necessary
+		$api->post('auth/jwt/login', 'AuthController@authenticate');
+		$api->post('auth/register', 'AuthController@register');
 
 		// All routes in here are protected and thus need a valid token
 		//$api->group( [ 'protected' => true, 'middleware' => 'jwt.refresh' ], function ($api) {
@@ -17,7 +17,7 @@ $api->version('v1', function ($api) {
 
 			$api->get('users/me', 'AuthController@me');
 			$api->get('validate_token', 'AuthController@validateToken');
-			$api->get('jwt/refresh', 'AuthController@refreshToken');
+			$api->get('auth/jwt/refresh', 'AuthController@refreshToken');
 			
 		});
 
