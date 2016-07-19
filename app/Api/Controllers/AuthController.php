@@ -6,6 +6,7 @@ use App\User;
 use Dingo\Api\Facade\API;
 use Illuminate\Http\Request;
 use Api\Requests\UserRequest;
+use Tymon\JWTAuth\Exceptions\TokenInvalidException;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Tymon\JWTAuth\Exceptions\JWTException;
 
@@ -32,6 +33,22 @@ class AuthController extends BaseController
         }
 
         // all good so return the token
+        return response()->json(compact('token'));
+    }
+
+    public function refreshToken()
+    {
+        $token = JWTAuth::getToken();
+        if (!$token) {
+            return response()->json(['error' => 'token_not_provided'], 400);
+        }
+
+        try {
+            $token = JWTAuth::refresh($token);
+        } catch (TokenInvalidException $e) {
+            return response()->json(['error' => 'token_invalid', 400]);
+        }
+
         return response()->json(compact('token'));
     }
 
