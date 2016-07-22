@@ -7,8 +7,11 @@ $api->version('v1', function ($api) {
 	// Set our namespace for the underlying routes
 	$api->group(['namespace' => 'Api\Controllers', 'middleware' => '\Barryvdh\Cors\HandleCors::class'], function ($api) {
 
-		// Login route
-		$api->post('auth/jwt/login', 'AuthController@authenticate');
+		// Login route - use Basic Auth
+		$api->group( [ 'middleware' => 'auth.basic.once' ], function($api) {
+			$api->post('auth/jwt/login', 'AuthController@authenticate');
+		});
+
 		$api->post('auth/register', 'AuthController@register');
 
 		// All routes in here are protected and thus need a valid token

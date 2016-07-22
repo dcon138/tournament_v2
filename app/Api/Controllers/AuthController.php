@@ -32,8 +32,14 @@ class AuthController extends BaseController
             return response()->json(['error' => 'could_not_create_token'], 500);
         }
 
+        $responseData = [
+            'token' => $token,
+            'data' => JWTAuth::getPayload($token)->toArray(),
+        ];
+        $responseData['data']['user'] = JWTAuth::toUser($token);
+
         // all good so return the token
-        return response()->json(compact('token'));
+        return response()->json($responseData);
     }
 
     public function refreshToken()
