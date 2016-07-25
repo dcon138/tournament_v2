@@ -9,9 +9,12 @@ use Api\Requests\UserRequest;
 use Tymon\JWTAuth\Exceptions\TokenInvalidException;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Tymon\JWTAuth\Exceptions\JWTException;
+use Tymon\JWTAuth\Facades\JWTFactory;
 
 class AuthController extends BaseController
 {
+    public static $THIRD_PARTY = 'third-party';
+
     public function me(Request $request)
     {
         return JWTAuth::parseToken()->authenticate();
@@ -77,7 +80,7 @@ class AuthController extends BaseController
     }
 
     /**
-     * Get an "anonymous" JWT not linked to a user - take an existing valid JWT and generate return a new one
+     * Essentially refreshes a JWT - but also works for third party tokens (tokens not linked to a registered user)
      *
      * @return \Illuminate\Http\JsonResponse
      */
@@ -89,18 +92,38 @@ class AuthController extends BaseController
         }
 
         try {
-            $user = JWTAuth::toUser($token);
+            $payload = JWTAuth::getPayload($token)->toArray();
+        } catch (TokenInvalidException $e) {
+            return response()->json(['error' => 'token_invalid'], 400);
+        }
+
+        try {
             $token = JWTAuth::refresh($token);
         } catch (TokenInvalidException $e) {
             return response()->json(['error' => 'token_invalid', 400]);
         }
+        $userData = !empty($payload['typ']) && $payload['typ'] === self::$THIRD_PARTY ? ['user' => JWTAuth::toUser($token)] : [];
 
-        $responseData = ['token' => $token, 'data' => JWTAuth::getPayload($token)->toArray()];
-        //if token is linked to user, return user data
-        if (!empty($user)) {
-            $responseData['data']['user'] = JWTAuth::toUser($token);
-        }
+        $responseData = ['token' => $token, 'data' => JWTAuth::getPayload($token)->toArray() + $userData];
 
+        return response()->json($responseData);
+    }
+
+    public function thirdPartyToken()
+    {
+        //this function is not currently accessible, but was implemented for testing so for now it is not allowed.
+        return response()->json(['method not allowed'], 405);
+
+        //if this function becomes allowed, you will need to update the credentials to something more
+        //meaningful - this was just a sample to test
+        $credentials = ['typ' => self::$THIRD_PARTY, 'sub' => 'front-end'];
+
+        $payload = JWTFactory::make($credentials);
+        $token = JWTAuth::encode($payload);
+        $responseData = [
+            'token' => $token->get(),
+            'data' => $payload->toArray(),
+        ];
         return response()->json($responseData);
     }
 
