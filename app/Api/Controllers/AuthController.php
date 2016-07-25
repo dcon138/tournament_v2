@@ -20,7 +20,10 @@ class AuthController extends BaseController
     public function authenticate(Request $request)
     {
         // grab credentials from the request
-        $credentials = $request->only('email', 'password');
+        $credentials = [
+            'email' => $request->getUser(),
+            'password' => $request->getPassword(),
+        ];
 
         try {
             // attempt to verify the credentials and create a token for the user
@@ -34,9 +37,8 @@ class AuthController extends BaseController
 
         $responseData = [
             'token' => $token,
-            'data' => JWTAuth::getPayload($token)->toArray(),
+            'data' => JWTAuth::getPayload($token)->toArray() + ['user' => JWTAuth::toUser($token)],
         ];
-        $responseData['data']['user'] = JWTAuth::toUser($token);
 
         // all good so return the token
         return response()->json($responseData);
@@ -55,7 +57,12 @@ class AuthController extends BaseController
             return response()->json(['error' => 'token_invalid', 400]);
         }
 
-        return response()->json(compact('token'));
+        $responseData = [
+            'token' => $token,
+            'data' => JWTAuth::getPayload($token)->toArray() + ['user' => JWTAuth::toUser($token)],
+        ];
+
+        return response()->json($responseData);
     }
 
     public function validateToken() 
