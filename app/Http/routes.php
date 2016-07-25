@@ -21,7 +21,8 @@ $api->version('v1', function ($api) {
 			$api->get('users/me', 'AuthController@me');
 			$api->get('validate_token', 'AuthController@validateToken');
 			$api->get('auth/jwt/refresh', 'AuthController@refreshToken');
-			
+			$api->get('auth/jwt/token', 'AuthController@getAnonymousToken');
+
 		});
 
 	});
