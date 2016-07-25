@@ -112,7 +112,7 @@ class AuthController extends BaseController
     public function thirdPartyToken()
     {
         //this function is not currently accessible, but was implemented for testing so for now it is not allowed.
-        return response()->json(['method not allowed'], 405);
+        return response()->json(['error' => 'method not allowed'], 405);
 
         //if this function becomes allowed, you will need to update the credentials to something more
         //meaningful - this was just a sample to test
