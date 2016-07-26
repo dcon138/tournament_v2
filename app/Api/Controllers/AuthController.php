@@ -102,7 +102,7 @@ class AuthController extends BaseController
         } catch (TokenInvalidException $e) {
             return response()->json(['error' => 'token_invalid', 400]);
         }
-        $userData = !empty($payload['typ']) && $payload['typ'] === self::$THIRD_PARTY ? ['user' => JWTAuth::toUser($token)] : [];
+        $userData = !empty($payload['typ']) && $payload['typ'] === self::$THIRD_PARTY ? [] : ['user' => JWTAuth::toUser($token)];
 
         $responseData = ['token' => $token, 'data' => JWTAuth::getPayload($token)->toArray() + $userData];
 

@@ -9,7 +9,9 @@
         "laravel/framework": "5.1.*",
         "dingo/api": "1.0.*@dev",
         "tymon/jwt-auth": "0.5.*",
-        "barryvdh/laravel-cors": "^0.7.1"
+        "barryvdh/laravel-cors": "^0.7.1",
+        "ramsey/uuid": "^2.8",
+        "moontoast/math": "~1.1"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^2.1",
@@ -40,7 +42,7 @@
             "php artisan optimize"
         ],
         "pre-update-cmd": [
-            "#php artisan clear-compiled"
+            "php artisan clear-compiled"
         ],
         "post-update-cmd": [
             "php artisan optimize"
