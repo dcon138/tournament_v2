@@ -19,7 +19,7 @@ class AuthenticateOnceWithBasicAuth
         if (Auth::onceBasic()) {
             return response()->json(['message' => 'Your username or password is invalid'], 401);
         } else {
-            $next($request);
+            return $next($request);
         }
     }
 }
