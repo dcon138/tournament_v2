@@ -23,6 +23,8 @@ php artisan db:seed
 php artisan key:generate
 php artisan vendor:publish --provider="Tymon\JWTAuth\Providers\JWTAuthServiceProvider"
 php artisan jwt:generate
+the above command should give output like 'jwt-auth secret [$randomToken] set successfully.'...
+...In .env, add the line "JWT_SECRET=$randomToken"
 ```
 
 ### Step 3: Serve (with Apache)
