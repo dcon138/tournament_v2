@@ -12,7 +12,6 @@ $api->version('v1', function ($api) {
 			$api->post('auth/jwt/login', 'AuthController@authenticate');
 		});
 
-		$api->post('auth/register', 'AuthController@register');
 		$api->get('auth/jwt/third', 'AuthController@thirdPartyToken');
 		$api->get('auth/jwt/token', 'AuthController@getAnonymousToken');
 
@@ -20,8 +19,6 @@ $api->version('v1', function ($api) {
 		//$api->group( [ 'protected' => true, 'middleware' => 'jwt.refresh' ], function ($api) {
 		$api->group( [ 'middleware' => 'jwt.auth' ], function ($api) {
 
-			$api->get('users/me', 'AuthController@me');
-			$api->get('validate_token', 'AuthController@validateToken');
 			$api->get('auth/jwt/refresh', 'AuthController@refreshToken');
 
 		});

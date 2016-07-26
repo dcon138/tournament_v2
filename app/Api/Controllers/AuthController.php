@@ -15,11 +15,6 @@ class AuthController extends BaseController
 {
     public static $THIRD_PARTY = 'third-party';
 
-    public function me(Request $request)
-    {
-        return JWTAuth::parseToken()->authenticate();
-    }
-
     /**
      * Login as an existing user - generate and return a new JWT
      *
@@ -109,6 +104,11 @@ class AuthController extends BaseController
         return response()->json($responseData);
     }
 
+    /**
+     * Generates a 'third party' JWT - one not linked to a registered user
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function thirdPartyToken()
     {
         //this function is not currently accessible, but was implemented for testing so for now it is not allowed.
@@ -127,22 +127,4 @@ class AuthController extends BaseController
         return response()->json($responseData);
     }
 
-    public function validateToken() 
-    {
-        // Our routes file should have already authenticated this token, so we just return success here
-        return API::response()->array(['status' => 'success'])->statusCode(200);
-    }
-
-    public function register(UserRequest $request)
-    {
-        $newUser = [
-            'name' => $request->get('name'),
-            'email' => $request->get('email'),
-            'password' => bcrypt($request->get('password')),
-        ];
-        $user = User::create($newUser);
-        $token = JWTAuth::fromUser($user);
-
-        return response()->json(compact('token'));
-    }
 }
