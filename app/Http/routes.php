@@ -9,7 +9,7 @@ $api->version('v1', function ($api) {
 
 		// Login route - use Basic Auth
 		$api->group( [ 'middleware' => 'auth.basic.once' ], function($api) {
-			$api->post('auth/jwt/login', 'AuthController@authenticate');
+			$api->get('auth/jwt/login', 'AuthController@authenticate');
 		});
 
 		$api->get('auth/jwt/third', 'AuthController@thirdPartyToken');
