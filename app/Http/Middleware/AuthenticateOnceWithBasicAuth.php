@@ -16,6 +16,10 @@ class AuthenticateOnceWithBasicAuth
      */
     public function handle($request, Closure $next)
     {
-        return Auth::onceBasic() ?: $next($request);
+        if (Auth::onceBasic()) {
+            return response()->json(['message' => 'Your username or password is invalid'], 401);
+        } else {
+            $next($request);
+        }
     }
 }
