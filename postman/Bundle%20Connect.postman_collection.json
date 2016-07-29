@@ -23,7 +23,7 @@
 						}
 					],
 					"request": {
-						"url": "http://local.api.bundleconnect.com.au/api/auth/jwt/third",
+						"url": "{{protocol}}://{{domain}}/auth/jwt/third",
 						"method": "GET",
 						"header": [],
 						"body": {
@@ -46,7 +46,7 @@
 						}
 					],
 					"request": {
-						"url": "http://local.api.bundleconnect.com.au/api/auth/jwt/token",
+						"url": "{{protocol}}://{{domain}}/auth/jwt/token",
 						"method": "GET",
 						"header": [
 							{
@@ -88,7 +88,7 @@
 						}
 					],
 					"request": {
-						"url": "http://local.api.bundleconnect.com.au/api/auth/jwt/login",
+						"url": "{{protocol}}://{{domain}}/auth/jwt/login",
 						"method": "GET",
 						"header": [
 							{
@@ -124,7 +124,7 @@
 						}
 					],
 					"request": {
-						"url": "http://local.api.bundleconnect.com.au/api/auth/jwt/login",
+						"url": "{{protocol}}://{{domain}}/auth/jwt/login",
 						"method": "GET",
 						"header": [
 							{
@@ -160,7 +160,7 @@
 						}
 					],
 					"request": {
-						"url": "http://local.api.bundleconnect.com.au/api/auth/jwt/login",
+						"url": "{{protocol}}://{{domain}}/auth/jwt/login",
 						"method": "GET",
 						"header": [
 							{
@@ -189,7 +189,7 @@
 						}
 					],
 					"request": {
-						"url": "http://local.api.bundleconnect.com.au/api/auth/jwt/refresh",
+						"url": "{{protocol}}://{{domain}}/auth/jwt/refresh",
 						"method": "GET",
 						"header": [
 							{
@@ -218,7 +218,7 @@
 						}
 					],
 					"request": {
-						"url": "http://local.api.bundleconnect.com.au/api/auth/jwt/token",
+						"url": "{{protocol}}://{{domain}}/auth/jwt/token",
 						"method": "GET",
 						"header": [
 							{
@@ -247,7 +247,7 @@
 						}
 					],
 					"request": {
-						"url": "http://local.api.bundleconnect.com.au/api/auth/jwt/token",
+						"url": "{{protocol}}://{{domain}}/auth/jwt/token",
 						"method": "GET",
 						"header": [
 							{
