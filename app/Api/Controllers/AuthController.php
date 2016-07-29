@@ -63,7 +63,7 @@ class AuthController extends BaseController
         try {
             $token = JWTAuth::refresh($token);
         } catch (TokenInvalidException $e) {
-            return response()->json(['error' => 'token_invalid', 400]);
+            return response()->json(['error' => 'token_invalid', 401]);
         }
 
         $responseData = [
@@ -89,13 +89,13 @@ class AuthController extends BaseController
         try {
             $payload = JWTAuth::getPayload($token)->toArray();
         } catch (TokenInvalidException $e) {
-            return response()->json(['error' => 'token_invalid'], 400);
+            return response()->json(['error' => 'token_invalid'], 401);
         }
 
         try {
             $token = JWTAuth::refresh($token);
         } catch (TokenInvalidException $e) {
-            return response()->json(['error' => 'token_invalid', 400]);
+            return response()->json(['error' => 'token_invalid', 401]);
         }
         $userData = !empty($payload['typ']) && $payload['typ'] === self::$THIRD_PARTY ? [] : ['user' => JWTAuth::toUser($token)];
 
