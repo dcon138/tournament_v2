@@ -21,6 +21,9 @@ $api->version('v1', function ($api) {
 
 			$api->get('auth/jwt/refresh', 'AuthController@refreshToken');
 
+			$api->post('clients', 'ClientsController@create');
+			$api->post('client_groups', 'ClientGroupsController@create');
+
 		});
 
 	});
