@@ -9,13 +9,14 @@ use Illuminate\Foundation\Auth\Access\Authorizable;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Traits\UuidModel;
 
 class User extends Model implements AuthenticatableContract,
                                     AuthorizableContract,
                                     CanResetPasswordContract
 {
-    use Authenticatable, Authorizable, CanResetPassword, UuidModel;
+    use Authenticatable, Authorizable, CanResetPassword, UuidModel, SoftDeletes;
 
     /**
      * The database table used by the model.
@@ -29,7 +30,7 @@ class User extends Model implements AuthenticatableContract,
      *
      * @var array
      */
-    protected $fillable = ['name', 'email', 'password'];
+    protected $fillable = ['first_name', 'last_name', 'email', 'password', 'phone'];
 
     /**
      * The attributes excluded from the model's JSON form.
@@ -37,6 +38,13 @@ class User extends Model implements AuthenticatableContract,
      * @var array
      */
     protected $hidden = ['id', 'password', 'remember_token'];
+
+    /**
+     * The attributes that should be mutated to dates.
+     *
+     * @var array
+     */
+    protected $dates = ['deleted_at'];
 
     /**
      * Get the identifier that will be stored in the subject claim of the JWT
@@ -54,5 +62,10 @@ class User extends Model implements AuthenticatableContract,
      */
     public function getJWTCustomClaims() {
         return [];
+    }
+
+    public function clients()
+    {
+        return $this->belongsToMany('App\Client', 'users_clients');
     }
 }
