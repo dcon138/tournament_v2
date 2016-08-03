@@ -2,7 +2,7 @@
 
 namespace Api\Controllers;
 
-use Illuminate\Http\Request;
+use Api\Requests\ClientRequest;
 use Api\Controllers\RestResourceController;
 use App\Client;
 
@@ -11,6 +11,8 @@ class ClientsController extends RestResourceController
     public function __construct()
     {
         $this->modelClass = Client::class;
-        $this->requestClass = Request::class; //TODO implement ClientRequest
+        $this->requestClass = ClientRequest::class;
+
+        parent::__construct();
     }
 }

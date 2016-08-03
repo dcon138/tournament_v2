@@ -3,10 +3,10 @@
 namespace App;
 
 use App\Traits\UuidModel;
-use Illuminate\Database\Eloquent\Model;
+use App\BaseModel;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class ClientGroup extends Model {
+class ClientGroup extends BaseModel {
     use UuidModel, SoftDeletes;
 
     /**

@@ -3,10 +3,10 @@
 namespace App;
 
 use App\Traits\UuidModel;
-use Illuminate\Database\Eloquent\Model;
+use App\BaseModel;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Client extends Model {
+class Client extends BaseModel {
     use UuidModel, SoftDeletes;
 
     /**
@@ -30,6 +30,10 @@ class Client extends Model {
      * @var array
      */
     protected $dates = ['deleted_at'];
+
+    protected $unconventionalForeignKeys = [
+        'primary_contact_id' => 'users',
+    ];
 
     public function client_group()
     {

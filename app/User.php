@@ -3,7 +3,7 @@
 namespace App;
 
 use Illuminate\Auth\Authenticatable;
-use Illuminate\Database\Eloquent\Model;
+use App\BaseModel;
 use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Foundation\Auth\Access\Authorizable;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
@@ -12,7 +12,7 @@ use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Traits\UuidModel;
 
-class User extends Model implements AuthenticatableContract,
+class User extends BaseModel implements AuthenticatableContract,
                                     AuthorizableContract,
                                     CanResetPasswordContract
 {

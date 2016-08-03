@@ -7,7 +7,15 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 trait UuidModel {
     /**
-     * SOURCE: http://humaan.com/using-uuids-with-eloquent-in-laravel/
+     * @var string $FOREIGN_KEY_REGEX
+     *
+     * Defines the regular expression that will be applied to field names to decide if the field is a foreign key field.
+     * If the field is defined as a foreign key field, it will have it's value auto-mapped from uuid to database id.
+     */
+    private static $FOREIGN_KEY_REGEX = '/.*_id$/';
+
+    /**
+     * Adapted From: http://humaan.com/using-uuids-with-eloquent-in-laravel/
      *
      * Binds creating/saving events to create UUIDs (and also prevent them from being overwritten).
      *
@@ -28,6 +36,32 @@ trait UuidModel {
                 //TODO should this throw an exception instead of just setting it back to what it was?
                 $model->uuid = $original_uuid;
             }
+
+
+            //TODO only do the below if $model is_subclass_of BaseModel?? if not the 2 conventional/unconventional function calls wont work
+            $modelAttributes = $model->attributesToArray();
+            $unconventionalForeignKeys = $model->getUnconventionalForeignKeys();
+            $conventionalNonForeignKeys = $model->getConventionalNonForeignKeys();
+            var_dump($modelAttributes);
+            var_dump($unconventionalForeignKeys);
+            foreach ($modelAttributes as $field => $value) {
+
+                //if the field is NOT in the ignore list
+                if (empty($conventionalNonForeignKeys) || !in_array($field, $conventionalNonForeignKeys)) {
+
+                    //if the field matches the foreign key field convention regex
+                    if (!empty($unconventionalForeignKeys) && array_key_exists($field, $unconventionalForeignKeys)) {
+                        //TODO look for database table with name $table. If not found, throw fatal error exception
+                        $table = $unconventionalForeignKeys[$field];
+                        echo 'Foreign Key to table ' . $table . ' is ' . $field . ' => ' . $value . "\n";
+                    } else if (preg_match(self::$FOREIGN_KEY_REGEX, $field)) {
+                        $table = str_plural(substr($field, 0, -3));
+                        //TODO look for database table with name $table. If not found, throw fatal error exception
+                        echo 'Foreign Key to table ' . $table . ' is ' . $field . ' => ' . $value . "\n";
+                    }
+                }
+            }
+            die('ccc');
         });
     }
 
