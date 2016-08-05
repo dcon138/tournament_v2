@@ -47,7 +47,7 @@ abstract class RestResourceController extends BaseController {
             if (empty($entity->getKey())) {
                 return response()->json(['error' => 'An internal server error has occurred.'], 500);
             } else {
-                return response()->json($entity->toArray());
+                return response()->json($entity->toArray(), 201);
             }
         } catch (FatalErrorException $e) {
             return response()->json(['error' => 'An internal error has occurred'], 500);
