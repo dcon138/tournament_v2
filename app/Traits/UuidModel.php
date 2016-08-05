@@ -23,6 +23,8 @@ trait UuidModel
      *
      * Binds creating/saving events to create UUIDs (and also prevent them from being overwritten).
      *
+     * Custom functionality added to switch out uuid's and database id's for saving / returning in the response.
+     *
      * @return void
      */
     public static function bootUuidModel()
@@ -58,16 +60,40 @@ trait UuidModel
         });
     }
 
+    /**
+     * Wrapper function which utilizes switchIdsAndUuids() to switch out database id's for uuid's for all foreign keys
+     * on an instantiated model.
+     *
+     * @param $model - the model instance to operate on
+     * @return bool - true on success, false otherwise.
+     */
     protected static function convertIdsToUuids($model)
     {
         return self::switchIdsAndUuids($model, 'getUuidFromId');
     }
 
+    /**
+     * Wrapper function which utilizes switchIdsAndUuids() to switch out uuid's for database id's for all foreign keys
+     * on an instantiated model.
+     *
+     * @param $model - the model instance to operate on
+     * @return bool - true on success, false otherwise.
+     */
     protected static function convertUuidsToIds($model)
     {
         return self::switchIdsAndUuids($model, 'getIdFromUuid');
     }
 
+    /**
+     * Function to process the fields for a model instance and switch out any foreign keys, swapping either id's for uuid's
+     * or uuid's for database id's depending on the value provided as the $function parameter.
+     *
+     * Takes into account the $unconventionalForeignKeys and $conventionalNonForeignKeys from the BaseModel class.
+     *
+     * @param $model - the model instance to operate on. Should be a child of \App\BaseModel.
+     * @param $function - the function to use to swap the values. At this stage, either getIdFromUuid or getUuidFromId.
+     * @return bool - true on success, false otherwise.
+     */
     protected static function switchIdsAndUuids($model, $function)
     {
         $success = true;
@@ -110,17 +136,40 @@ trait UuidModel
         return $success;
     }
 
+    /**
+     * Wrapper function that utilizes getFieldFromField() to get the uuid of a row from $table where the id is $id
+     *
+     * @param $table
+     * @param $id
+     * @return string
+     */
     protected static function getUuidFromId($table, $id)
     {
         return self::getFieldFromField($table, 'uuid', 'id', $id);
     }
 
-
+    /**
+     * Wrapper function that utilizes getFieldFromField() to get the id of a row from $table where the uuid is $uuid
+     *
+     * @param $table
+     * @param $uuid
+     * @return string
+     */
     protected static function getIdFromUuid($table, $uuid)
     {
         return self::getFieldFromField($table, 'id', 'uuid', $uuid);
     }
 
+    /**
+     * Simple function designed to get one field from one row of a table where another field has a certain value.
+     *
+     * @param $table - the table to retrieve from
+     * @param $getField - the field whose value to return
+     * @param $fromField - the field on which the where clause will be applied
+     * @param $fromFieldValue - the value that $fromField must have in the where clause
+     * @return string - the value of $getField
+     * @throws ModelNotFoundException - if the row is not found, or the field in that row is empty or not set.
+     */
     protected static function getFieldFromField($table, $getField, $fromField, $fromFieldValue)
     {
         $result = DB::select("SELECT " . $getField . " FROM " . $table . " WHERE " . $fromField . " = ?", [$fromFieldValue]);
