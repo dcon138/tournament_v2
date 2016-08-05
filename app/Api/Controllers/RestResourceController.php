@@ -2,10 +2,11 @@
 
 namespace Api\Controllers;
 
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Container\Container;
 use Psy\Exception\FatalErrorException;
-use Illuminate\Database\Eloquent\Model;
+use App\BaseModel;
 
 abstract class RestResourceController extends BaseController {
     protected $modelClass;
@@ -20,8 +21,8 @@ abstract class RestResourceController extends BaseController {
     {
         if (empty($this->modelClass)) {
             throw new FatalErrorException('Child Model class must be defined in Child Controller');
-        } else if (!is_subclass_of($this->modelClass, Model::class)) {
-            throw new FatalErrorException('Child Model provided does not extend base Eloquent model class');
+        } else if (!is_subclass_of($this->modelClass, BaseModel::class)) {
+            throw new FatalErrorException('Child Model provided does not extend base model class');
         }
     }
 
@@ -36,8 +37,18 @@ abstract class RestResourceController extends BaseController {
         try {
             $this->validateChildFormRequest($request);
             $model = $this->modelClass;
-            $entity = $model::create($request->input());
-            return response()->json($entity->toArray());
+
+            try {
+                $entity = $model::create($request->input());
+            } catch (ModelNotFoundException $e) {
+                return response()->json(['error' => $e->getMessage()], 404);
+            }
+
+            if (empty($entity->getKey())) {
+                return response()->json(['error' => 'An internal server error has occurred.'], 500);
+            } else {
+                return response()->json($entity->toArray());
+            }
         } catch (FatalErrorException $e) {
             return response()->json(['error' => 'An internal error has occurred'], 500);
         }

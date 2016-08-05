@@ -2,12 +2,11 @@
 
 namespace App;
 
-use App\Traits\UuidModel;
 use App\BaseModel;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class State extends BaseModel {
-    use UuidModel, SoftDeletes;
+    use SoftDeletes;
 
     /**
      * The attributes that are mass assignable.

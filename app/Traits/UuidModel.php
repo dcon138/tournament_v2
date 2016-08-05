@@ -2,17 +2,21 @@
 
 namespace App\Traits;
 
+use Illuminate\Support\Facades\DB;
 use Rhumsaa\Uuid\Uuid;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use App\BaseModel;
+use Illuminate\Database\QueryException;
 
-trait UuidModel {
+trait UuidModel
+{
     /**
      * @var string $FOREIGN_KEY_REGEX
      *
      * Defines the regular expression that will be applied to field names to decide if the field is a foreign key field.
      * If the field is defined as a foreign key field, it will have it's value auto-mapped from uuid to database id.
      */
-    private static $FOREIGN_KEY_REGEX = '/.*_id$/';
+    protected static $FOREIGN_KEY_REGEX = '/.*_id$/';
 
     /**
      * Adapted From: http://humaan.com/using-uuids-with-eloquent-in-laravel/
@@ -33,36 +37,99 @@ trait UuidModel {
             $original_uuid = $model->getOriginal('uuid');
 
             if ($original_uuid !== $model->uuid) {
-                //TODO should this throw an exception instead of just setting it back to what it was?
                 $model->uuid = $original_uuid;
             }
 
+            //if the model being saved is a child of our base model, then let's substitute any foreign key values.
+            //at this stage, they will be uuid's. For saving, we need them to be database id's.
+            if (!static::convertUuidsToIds($model)) {
+                //if we get to this point in execution, a programming error has occurred. prevent save and return false.
+                return false;
+            }
+        });
 
-            //TODO only do the below if $model is_subclass_of BaseModel?? if not the 2 conventional/unconventional function calls wont work
+        static::saved(function ($model) {
+            //if the model that has been saved is a child of our base model, then let's substitute any foreign key values.
+            //at this stage, they will be database id's. For returning to the front-end, we need them to be uuid's.
+            if (!static::convertIdsToUuids($model)) {
+                //if we get to this point in execution, a programming error has occurred. prevent save and return false.
+                return false;
+            }
+        });
+    }
+
+    protected static function convertIdsToUuids($model)
+    {
+        return self::switchIdsAndUuids($model, 'getUuidFromId');
+    }
+
+    protected static function convertUuidsToIds($model)
+    {
+        return self::switchIdsAndUuids($model, 'getIdFromUuid');
+    }
+
+    protected static function switchIdsAndUuids($model, $function)
+    {
+        $success = true;
+        if (is_subclass_of($model, BaseModel::class)) {
             $modelAttributes = $model->attributesToArray();
             $unconventionalForeignKeys = $model->getUnconventionalForeignKeys();
             $conventionalNonForeignKeys = $model->getConventionalNonForeignKeys();
-            var_dump($modelAttributes);
-            var_dump($unconventionalForeignKeys);
+
+            //loop through each attribute to be saved, and determine if it is a foreign key
             foreach ($modelAttributes as $field => $value) {
 
                 //if the field is NOT in the ignore list
                 if (empty($conventionalNonForeignKeys) || !in_array($field, $conventionalNonForeignKeys)) {
 
-                    //if the field matches the foreign key field convention regex
                     if (!empty($unconventionalForeignKeys) && array_key_exists($field, $unconventionalForeignKeys)) {
-                        //TODO look for database table with name $table. If not found, throw fatal error exception
+                        //if the field is in the list of foreign keys that don't match convention
                         $table = $unconventionalForeignKeys[$field];
-                        echo 'Foreign Key to table ' . $table . ' is ' . $field . ' => ' . $value . "\n";
                     } else if (preg_match(self::$FOREIGN_KEY_REGEX, $field)) {
+                        //otherwise if the field matches the foreign key field convention regex
                         $table = str_plural(substr($field, 0, -3));
-                        //TODO look for database table with name $table. If not found, throw fatal error exception
-                        echo 'Foreign Key to table ' . $table . ' is ' . $field . ' => ' . $value . "\n";
+                    } else {
+                        //if we get here, nothing needs to be done for this field so skip to the next one.
+                        continue;
+                    }
+
+                    //determine the database id from the uuid, and update the value of the field to be saved.
+                    try {
+                        $id = $model->{$function}($table, $value);
+                    } catch (QueryException $e) {
+                        $success = false;
+                    }
+                    if ($id === false) {
+                        $success = false;
+                    } else {
+                        $model->{$field} = $id;
                     }
                 }
             }
-            die('ccc');
-        });
+        }
+        return $success;
+    }
+
+    protected static function getUuidFromId($table, $id)
+    {
+        return self::getFieldFromField($table, 'uuid', 'id', $id);
+    }
+
+
+    protected static function getIdFromUuid($table, $uuid)
+    {
+        return self::getFieldFromField($table, 'id', 'uuid', $uuid);
+    }
+
+    protected static function getFieldFromField($table, $getField, $fromField, $fromFieldValue)
+    {
+        $result = DB::select("SELECT " . $getField . " FROM " . $table . " WHERE " . $fromField . " = ?", [$fromFieldValue]);
+
+        if (empty($result[0]->{$getField})) {
+            throw new ModelNotFoundException('Record not found in table ' . $table . ' with ' . $fromField . ' ' . $fromFieldValue);
+        }
+
+        return $result[0]->{$getField};
     }
 
     /**

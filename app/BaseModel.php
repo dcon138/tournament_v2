@@ -2,9 +2,11 @@
 
 namespace App;
 
+use App\Traits\UuidModel;
 use Illuminate\Database\Eloquent\Model;
 
 abstract class BaseModel extends Model {
+    use UuidModel;
     /**
      * @var $unconventionalForeignKeys
      *
