@@ -62,9 +62,4 @@ class User extends BaseModel implements AuthenticatableContract,
     public function getJWTCustomClaims() {
         return [];
     }
-
-    public function clients()
-    {
-        return $this->belongsToMany('App\Client', 'users_clients');
-    }
 }
