@@ -27,7 +27,7 @@ abstract class RestResourceController extends BaseController {
     }
 
     /**
-     * Create a new client group entity
+     * Create a new entity
      *
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
