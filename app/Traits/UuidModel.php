@@ -10,6 +10,9 @@ use Illuminate\Database\QueryException;
 
 trait UuidModel
 {
+
+    public static $UUID_REGEX = '^([0-9]+|[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$';
+
     /**
      * @var string $FOREIGN_KEY_REGEX
      *
@@ -196,7 +199,7 @@ trait UuidModel
      */
     public function scopeUuid($query, $uuid, $first = true)
     {
-        if (!is_string($uuid) || (preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/', $uuid) !== 1)) {
+        if (!is_string($uuid) || (preg_match('/' . self::$UUID_REGEX . '/', $uuid) !== 1)) {
             throw (new ModelNotFoundException)->setModel(get_class($this));
         }
 
@@ -224,7 +227,7 @@ trait UuidModel
             throw (new ModelNotFoundException)->setModel(get_class($this));
         }
 
-        if (preg_match('/^([0-9]+|[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$/', $id_or_uuid) !== 1) {
+        if (preg_match('/' . self::$UUID_REGEX . '/', $id_or_uuid) !== 1) {
             throw (new ModelNotFoundException)->setModel(get_class($this));
         }
 
