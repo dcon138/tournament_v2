@@ -23,6 +23,7 @@ $api->version('v1', function ($api) {
 
 			$api->post('clients', 'ClientsController@create');
 			$api->post('client_groups', 'ClientGroupsController@create');
+			$api->post('states', 'StatesController@create');
 
 		});
 
