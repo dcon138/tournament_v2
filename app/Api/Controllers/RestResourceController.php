@@ -54,6 +54,17 @@ abstract class RestResourceController extends BaseController {
         }
     }
 
+    public function getOne(Request $request, $uuid)
+    {
+        try {
+            $model = $this->modelClass;
+            $entity = $model::uuid($uuid);
+            return response()->json($entity->toArray());
+        } catch (ModelNotFoundException $e) {
+            return response()->json(['error' => 'Record not found'], 404);
+        }
+    }
+
     /**
      * Validates the request according to validation and authorization rules defined in a child class of FormRequest.
      * This is necessary because we can't type-hint based on dynamic values set in child classes.
