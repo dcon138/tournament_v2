@@ -238,4 +238,26 @@ trait UuidModel
 
         return $first ? $search->firstOrFail() : $search;
     }
+
+    /**
+     * Create a collection of models from plain arrays.
+     *
+     * Overridden to also convert database id's to uuid's for foreign keys upon model hydration.
+     *
+     * @param  array  $items
+     * @param  string|null  $connection
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public static function hydrate(array $items, $connection = null)
+    {
+        $instance = (new static)->setConnection($connection);
+
+        $items = array_map(function ($item) use ($instance) {
+            $model = $instance->newFromBuilder($item);
+            static::convertIdsToUuids($model);
+            return $model;
+        }, $items);
+
+        return $instance->newCollection($items);
+    }
 }
