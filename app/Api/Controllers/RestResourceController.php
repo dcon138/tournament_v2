@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Container\Container;
 use Psy\Exception\FatalErrorException;
 use App\BaseModel;
+use Illuminate\Support\Facades\Route;
 
 abstract class RestResourceController extends BaseController {
     protected $modelClass;
@@ -54,6 +55,13 @@ abstract class RestResourceController extends BaseController {
         }
     }
 
+    /**
+     * Retrieves one record of a given entity by it's uuid
+     *
+     * @param Request $request - the request object
+     * @param $uuid - the uuid of the entity to retrieve
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function getOne(Request $request, $uuid)
     {
         try {
@@ -62,6 +70,48 @@ abstract class RestResourceController extends BaseController {
             return response()->json($entity->toArray());
         } catch (ModelNotFoundException $e) {
             return response()->json(['error' => 'Record not found'], 404);
+        }
+    }
+
+    /**
+     * Retrieves all entities that belong to one record of a parent entity, based on the uuid of the parent entity.
+     *
+     * @param Request $request - the request object
+     * @param $parent - the parent entity resource (from route)
+     * @param $parent_uuid - the parent entity uuid (from route)
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getAllForParent(Request $request, $parent, $parent_uuid)
+    {
+        try {
+            $model = $this->modelClass;
+
+            //get details for parent model, and how to retrieve child model from parent
+            $parentModels = $model::$PARENT_MODELS;
+
+            if (empty($parentModels[$parent]['class']) || empty($parentModels[$parent]['function'])) {
+                throw new FatalErrorException('Parent model definition must include class and function name');
+            }
+
+            $parent = $parentModels[$parent];
+            $parentClass = $parent['class'];
+            $relationFunction = $parent['function'];
+
+            //get the parent model
+            $parentObject = $parentClass::uuid($parent_uuid);
+
+            //ensure that the defined function exists to get from the parent model to the child model collection
+            if (!method_exists($parentObject, $relationFunction)) {
+                throw new FatalErrorException('Function ' . $relationFunction . ' did not exist on parent model class ' . $parentClass);
+            }
+
+            //retrieve child models, and return response.
+            $children = $parentObject->{$relationFunction}()->get();
+            return response()->json($children->toArray());
+        } catch (ModelNotFoundException $e) {
+            return response()->json(['error' => 'Record not found'], 404);
+        } catch (FatalErrorException $e) {
+            return response()->json(['error' => 'An internal error has occurred'], 500);
         }
     }
 

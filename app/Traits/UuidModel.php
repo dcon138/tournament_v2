@@ -111,6 +111,9 @@ trait UuidModel
                 //if the field is NOT in the ignore list
                 if (empty($conventionalNonForeignKeys) || !in_array($field, $conventionalNonForeignKeys)) {
 
+                    //if many-to-many relationship data is included, column name will be prefixed by 'pivot_', so remove it temporarily.
+                    $originalField = $field;
+                    $field = preg_replace('/^pivot_/', '', $field);
                     if (!empty($unconventionalForeignKeys) && array_key_exists($field, $unconventionalForeignKeys)) {
                         //if the field is in the list of foreign keys that don't match convention
                         $table = $unconventionalForeignKeys[$field];
@@ -131,7 +134,7 @@ trait UuidModel
                     if ($id === false) {
                         $success = false;
                     } else {
-                        $model->{$field} = $id;
+                        $model->{$originalField} = $id;
                     }
                 }
             }
