@@ -107,6 +107,10 @@ trait UuidModel
 
             //loop through each attribute to be saved, and determine if it is a foreign key
             foreach ($modelAttributes as $field => $value) {
+                if (empty($value)) {
+                    //if no value in this field, there is no point converting it.
+                    continue;
+                }
 
                 //if the field is NOT in the ignore list
                 if (empty($conventionalNonForeignKeys) || !in_array($field, $conventionalNonForeignKeys)) {
