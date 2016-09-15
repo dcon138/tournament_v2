@@ -25,7 +25,6 @@ $api->version('v1', function ($api) use ($regexes) {
 
 			$api->get('auth/jwt/refresh', 'AuthController@refreshToken');
 
-                        $api->patch('users/{uuid}', 'UsersController@updateOne')->where($regexes);
 		});
 
 	});
