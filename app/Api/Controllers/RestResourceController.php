@@ -72,6 +72,27 @@ abstract class RestResourceController extends BaseController {
             return response()->json(['error' => 'Record not found'], 404);
         }
     }
+    
+    /**
+     * Retrieves one record of a given entity by it's uuid,
+     * then updates it with the data submitted in the request
+     * 
+     * @param Request $request - the request object
+     * @param $uuid - the uuid of the entity to update
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function updateOne(Request $request, $uuid)
+    {
+        try {
+            $model = $this->modelClass;
+            //TODO run formrequest validation here
+            $entity = $model::uuid($uuid);
+            $entity->update($request->input());
+            return response()->json($entity->toArray());
+        } catch (ModelNotFoundException $e) {
+            return response()->json(['error' => 'Record not found'], 404);
+        }
+    }
 
     /**
      * Retrieves all entities that belong to one record of a parent entity, based on the uuid of the parent entity.
