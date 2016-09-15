@@ -84,11 +84,14 @@ abstract class RestResourceController extends BaseController {
     public function updateOne(Request $request, $uuid)
     {
         try {
+            $this->validateChildFormRequest($request);
+
             $model = $this->modelClass;
-            //TODO run formrequest validation here
             $entity = $model::uuid($uuid);
             $entity->update($request->input());
             return response()->json($entity->toArray());
+        } catch (FatalErrorException $e) {
+            return response()->json(['error' => 'An internal error has occurred'], 500);
         } catch (ModelNotFoundException $e) {
             return response()->json(['error' => 'Record not found'], 404);
         }
