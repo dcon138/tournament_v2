@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Route;
 
 abstract class RestResourceController extends BaseController {
     protected $modelClass;
-    protected $requestClass;
+    protected $requestClasses;
 
     /**
      * RestResourceController constructor. Checks that modelClass for the resource has been defined correctly.
@@ -36,7 +36,7 @@ abstract class RestResourceController extends BaseController {
     public function create(Request $request)
     {
         try {
-            $this->validateChildFormRequest($request);
+            $this->validateChildFormRequest($request, 'create');
             $model = $this->modelClass;
 
             try {
@@ -84,7 +84,7 @@ abstract class RestResourceController extends BaseController {
     public function updateOne(Request $request, $uuid)
     {
         try {
-            $this->validateChildFormRequest($request);
+            $this->validateChildFormRequest($request, 'update');
 
             $model = $this->modelClass;
             $entity = $model::uuid($uuid);
@@ -147,13 +147,14 @@ abstract class RestResourceController extends BaseController {
      * @throws FatalErrorException - if the child class of FormRequest hasn't been set into $this->requestClass in the
      *                               child controller.
      */
-    private function validateChildFormRequest($request)
+    private function validateChildFormRequest($request, $operation)
     {
-        if (empty($this->requestClass)) {
+        if (empty($operation) || empty($this->requestClasses[$operation])) {
             throw new FatalErrorException('Child FormRequest class must be defined with validation and authorize rules');
         }
-        $childRequestClass = $this->requestClass;
+        $childRequestClass = $this->requestClasses[$operation];
         $newRequest = $childRequestClass::createFromBase($request);
+        $newRequest->setRouteResolver($request->getRouteResolver());
         $newRequest->setContainer(Container::getInstance());
         $newRequest->validate();
     }
