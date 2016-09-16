@@ -98,6 +98,13 @@ abstract class RestResourceController extends BaseController {
         }
     }
     
+    /**
+     * Deletes one record of a given entity by it's uuid.
+     * 
+     * @param \Illuminate\Http\Request $request - the request object
+     * @param type $uuid - the uuid of the entity to delete
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function deleteOne(Request $request, $uuid)
     {
         try {
@@ -153,6 +160,23 @@ abstract class RestResourceController extends BaseController {
             return response()->json(['error' => 'Record not found'], 404);
         } catch (FatalErrorException $e) {
             return response()->json(['error' => 'An internal error has occurred'], 500);
+        }
+    }
+    
+    /**
+     * Retrieves all records for a given entity.
+     * 
+     * @param \Illuminate\Http\Request $request - the request object
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getAll(Request $request)
+    {
+        try {
+            $model = $this->modelClass;
+            $results = $model::all();
+            return response()->json($results->toArray(), 200);
+        } catch (ModelNotFoundException $e) {
+            return response()->json(['error' => 'Model not found'], 404);
         }
     }
 

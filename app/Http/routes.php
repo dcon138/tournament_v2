@@ -25,7 +25,10 @@ $api->version('v1', function ($api) use ($regexes) {
 
 			$api->get('auth/jwt/refresh', 'AuthController@refreshToken');
                         
+                        $api->get('users', 'UsersController@getAll');
                         $api->post('users', 'UsersController@create');
+                        
+                        $api->get('users/{uuid}', 'UsersController@getOne')->where($regexes);
                         $api->patch('users/{uuid}', 'UsersController@updateOne')->where($regexes);
                         $api->delete('users/{uuid}', 'UsersController@deleteOne')->where($regexes);
 		});

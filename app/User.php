@@ -15,7 +15,7 @@ class User extends BaseModel implements AuthenticatableContract,
                                     AuthorizableContract,
                                     CanResetPasswordContract
 {
-    use Authenticatable, Authorizable, CanResetPassword, SoftDeletes;
+    use Authenticatable, Authorizable, CanResetPassword;
 
     /**
      * The database table used by the model.
@@ -63,8 +63,9 @@ class User extends BaseModel implements AuthenticatableContract,
         return [];
     }
     
-    public function bootUser()
+    public static function bootUser()
     {
+        die('aaaaaA');
         //TODO this doesn't even run. look up how to implement password hashing in L5.
         static::saving(function ($model) {
             $password = $model->password;
