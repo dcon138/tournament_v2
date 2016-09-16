@@ -8,6 +8,7 @@ use Illuminate\Container\Container;
 use Psy\Exception\FatalErrorException;
 use App\BaseModel;
 use Illuminate\Support\Facades\Route;
+use Dingo\Api\Http\Response;
 
 abstract class RestResourceController extends BaseController {
     protected $modelClass;
@@ -93,6 +94,22 @@ abstract class RestResourceController extends BaseController {
         } catch (FatalErrorException $e) {
             return response()->json(['error' => 'An internal error has occurred'], 500);
         } catch (ModelNotFoundException $e) {
+            return response()->json(['error' => 'Record not found'], 404);
+        }
+    }
+    
+    public function deleteOne(Request $request, $uuid)
+    {
+        try {
+            $model = $this->modelClass;
+            $entity = $model::uuid($uuid);
+            if ($entity->delete()){
+                return response()->make('', 204);
+            } else {
+                return response()->json(['error' => 'Something went wrong whilst deleting the record.'], 500);
+            }
+        } catch (ModelNotFoundException $e) {
+            dd($e->getMessage());
             return response()->json(['error' => 'Record not found'], 404);
         }
     }
