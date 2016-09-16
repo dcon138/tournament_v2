@@ -24,15 +24,16 @@ class UpdateUserRequest extends FormRequest
      */
     public function rules()
     {
-        $uuid = $this->route('uuid');
-        if (empty($uuid)) {
-            throw new NotFoundHttpException('Uuid not found');
-        }
-        return [
+        $rules = [
             'first_name' => 'max:255',
             'last_name'=> 'max:255',
-            'email' => 'email|max:255|unique:users,email,' . $uuid . ',uuid',
-            'password' => 'confirmed|min:4',
+            'email' => 'email|max:255|unique:users',
+            'password' => 'min:4',
         ];
+        $uuid = $this->route('uuid');
+        if (!empty($uuid)) {
+            $rules['email'] .= ',email,' . $uuid . ',uuid';
+        }
+        return $rules;
     }
 }

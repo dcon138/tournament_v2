@@ -62,4 +62,16 @@ class User extends BaseModel implements AuthenticatableContract,
     public function getJWTCustomClaims() {
         return [];
     }
+    
+    public function bootUser()
+    {
+        //TODO this doesn't even run. look up how to implement password hashing in L5.
+        static::saving(function ($model) {
+            $password = $model->password;
+
+            if (!empty($password)) {
+                $model->password = bcrypt($password);
+            }
+        });
+    }
 }
