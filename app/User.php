@@ -62,15 +62,29 @@ class User extends BaseModel implements AuthenticatableContract,
     public function getJWTCustomClaims() {
         return [];
     }
-    
-    public static function bootUser()
+
+    /**
+     * Add boot function to implement password hashing
+     */
+    protected static function boot()
     {
-        die('aaaaaA');
-        //TODO this doesn't even run. look up how to implement password hashing in L5.
-        static::saving(function ($model) {
+        parent::boot();
+        
+        //on create, always hash password.
+        static::creating(function ($model) {
             $password = $model->password;
 
             if (!empty($password)) {
+                $model->password = bcrypt($password);
+            }
+        });
+        
+        //on edit, if current password isn't equal to original, hash it
+        static::updating(function ($model) {
+            $password = $model->password;
+            $original_password = $model->getOriginal('password');
+
+            if (!empty($password) && !empty($original_password) && $password !== $original_password) {
                 $model->password = bcrypt($password);
             }
         });
